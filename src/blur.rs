@@ -1,5 +1,5 @@
 use std::collections::VecDeque;
-use std::num::{NonZeroU8, NonZeroUsize};
+use std::num::{NonZeroU32, NonZeroUsize};
 
 use crate::columns::GridSlice;
 
@@ -25,16 +25,16 @@ const fn pixel(a: u32, r: u32, g: u32, b: u32) -> u32 {
 
 /// Performs a pass of stackblur in both directions.
 /// Input is expected to be in linear RGB color space.
-pub fn blur(src: &mut [u32], width: NonZeroUsize, height: NonZeroUsize, radius: NonZeroU8) {
+pub fn blur(src: &mut [u32], width: NonZeroUsize, height: NonZeroUsize, radius: NonZeroU32) {
     blur_horiz(src, width, radius);
     blur_vert(src, width, height, radius);
 }
 
 /// Performs a horizontal pass of stackblur.
 /// Input is expected to be in linear RGB color space.
-pub fn blur_horiz(src: &mut [u32], width: NonZeroUsize, radius: NonZeroU8) {
+pub fn blur_horiz(src: &mut [u32], width: NonZeroUsize, radius: NonZeroU32) {
     let width = width.get();
-    let radius = u32::from(radius.get());
+    let radius = radius.get();
     let r = radius as usize;
     let div = radius * (radius + 2) + 1;
 
@@ -123,10 +123,10 @@ pub fn blur_horiz(src: &mut [u32], width: NonZeroUsize, radius: NonZeroU8) {
 
 /// Performs a vertical pass of stackblur.
 /// Input is expected to be in linear RGB color space.
-pub fn blur_vert(src: &mut [u32], width: NonZeroUsize, height: NonZeroUsize, radius: NonZeroU8) {
+pub fn blur_vert(src: &mut [u32], width: NonZeroUsize, height: NonZeroUsize, radius: NonZeroU32) {
     let width = width.get();
     let height = height.get();
-    let radius = u32::from(radius.get());
+    let radius = radius.get();
     let r = radius as usize;
     let div = radius * (radius + 2) + 1;
 
@@ -217,7 +217,7 @@ pub fn blur_vert(src: &mut [u32], width: NonZeroUsize, height: NonZeroUsize, rad
 
 #[cfg(test)]
 mod test {
-    use std::num::{NonZeroU8, NonZeroUsize};
+    use std::num::NonZeroUsize;
 
     use super::blur;
 
@@ -227,7 +227,7 @@ mod test {
 
         let w = NonZeroUsize::new(1).unwrap();
         let h = NonZeroUsize::new(1).unwrap();
-        let r = NonZeroU8::new(1).unwrap();
+        let r = NonZeroU32::new(1).unwrap();
 
         blur(&mut empty, w, h, r);
 
@@ -239,7 +239,7 @@ mod test {
         let mut v = vec![0x12345678];
         let w = NonZeroUsize::new(1).unwrap();
         let h = NonZeroUsize::new(1).unwrap();
-        let r = NonZeroU8::new(1).unwrap();
+        let r = NonZeroU32::new(1).unwrap();
 
         blur(&mut v, w, h, r);
 
@@ -251,7 +251,7 @@ mod test {
         let mut v = vec![0x12345678; 9];
         let w = NonZeroUsize::new(3).unwrap();
         let h = NonZeroUsize::new(3).unwrap();
-        let r = NonZeroU8::new(u8::MAX).unwrap();
+        let r = NonZeroU32::new(255).unwrap();
 
         blur(&mut v, w, h, r);
 
@@ -263,7 +263,7 @@ mod test {
         let mut v = vec![0x12345678; 9];
         let w = NonZeroUsize::new(5).unwrap();
         let h = NonZeroUsize::new(5).unwrap();
-        let r = NonZeroU8::new(15).unwrap();
+        let r = NonZeroU32::new(15).unwrap();
 
         blur(&mut v, w, h, r);
 
